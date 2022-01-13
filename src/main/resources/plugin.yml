@@ -1,0 +1,7 @@
+name: LuckPerm-Display-Names-For-PAF
+version: ${project.version}
+author: Simonsator
+depend: [ PartyAndFriends, LuckPerms ]
+depends: [ PartyAndFriends, LuckPerms ]
+main: de.simonsator.partyandfriends.extensions.luckperms.prefixes.PrefixesPermsPlugin
+description: An add-on for party and friends to add display names from luckperm to the names
