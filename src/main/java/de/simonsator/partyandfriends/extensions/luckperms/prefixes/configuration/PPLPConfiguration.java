@@ -15,7 +15,9 @@ public class PPLPConfiguration extends ConfigurationCreator {
 	}
 
 	private void loadDefaults() {
-		set("DisplayName", "<%LUCKPERMS_PREFIX%> %PLAYER_NAME% <%LUCKPERMS_SUFFIX%>");
+		set("DisplayName", "&e<%LUCKPERMS_PREFIX%&e> %PLAYER_NAME% &e<%LUCKPERMS_SUFFIX%&e>");
+		set("Cache.Activated", true);
+		set("Cache.TimeInSeconds", 240);
 	}
 
 }

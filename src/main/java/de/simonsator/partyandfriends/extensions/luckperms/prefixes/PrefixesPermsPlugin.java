@@ -10,14 +10,20 @@ import de.simonsator.partyandfriends.utilities.ConfigurationCreator;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
+import net.md_5.bungee.api.ChatColor;
+import net.md_5.bungee.api.ProxyServer;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProvider {
 	private UserManager userManager;
 	private String displayNameTemplate;
+	private HashMap<UUID, String> cache = new HashMap<>();
 
 	@Override
 	public void onEnable() {
@@ -27,6 +33,9 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 			displayNameTemplate = config.getString("DisplayName");
 			PAFPlayerClass.setDisplayNameProvider(this);
 			userManager = LuckPermsProvider.get().getUserManager();
+			ProxyServer.getInstance().getScheduler().schedule(this, () -> {
+				cache = new HashMap<>();
+			}, config.getLong("Cache.TimeInSeconds"), config.getLong("Cache.TimeInSeconds"), TimeUnit.SECONDS);
 			registerAsExtension();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -42,12 +51,18 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 		String suffix = luckpermsUser.getCachedData().getMetaData().getSuffix();
 		if (suffix == null)
 			suffix = "";
-		return displayNameTemplate.replaceAll("%LUCKPERMS_PREFIX%", prefix).
-				replaceAll("%LUCKPERMS_SUFFIX%", suffix).replaceAll("%PLAYER_NAME%", pPlayer.getName());
+		String displayName = ChatColor.translateAlternateColorCodes('&',
+				displayNameTemplate.replaceAll("%LUCKPERMS_PREFIX%", prefix).
+						replaceAll("%LUCKPERMS_SUFFIX%", suffix).replaceAll("%PLAYER_NAME%", pPlayer.getName()));
+		cache.put(pPlayer.getUniqueId(), displayName);
+		return displayName;
 	}
 
 	@Override
 	public String getDisplayName(PAFPlayer pPlayer) {
+		String displayName = cache.get(pPlayer.getUniqueId());
+		if (displayName != null)
+			return displayName;
 		try {
 			User luckpermsUser = userManager.loadUser(pPlayer.getUniqueId()).get();
 			return getDisplayName(pPlayer, luckpermsUser);
@@ -59,6 +74,9 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 
 	@Override
 	public String getDisplayName(OnlinePAFPlayer pPlayer) {
+		String displayName = cache.get(pPlayer.getUniqueId());
+		if (displayName != null)
+			return displayName;
 		return getDisplayName(pPlayer, userManager.getUser(pPlayer.getUniqueId()));
 	}
 }
