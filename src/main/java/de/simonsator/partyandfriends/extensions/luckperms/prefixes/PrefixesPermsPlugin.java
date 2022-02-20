@@ -19,11 +19,15 @@ import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProvider {
 	private UserManager userManager;
 	private String displayNameTemplate;
 	private HashMap<UUID, String> cache;
+	private boolean reformatHexColor;
+	private final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
 
 	@Override
 	public void onEnable() {
@@ -31,13 +35,13 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 			ConfigurationCreator config = new PPLPConfiguration(new File(getConfigFolder(), "config.yml"),
 					this);
 			displayNameTemplate = config.getString("DisplayName");
-			PAFPlayerClass.setDisplayNameProvider(this);
+			reformatHexColor = config.getBoolean("ReformatHexColors");
 			userManager = LuckPermsProvider.get().getUserManager();
+			PAFPlayerClass.setDisplayNameProvider(this);
 			if (config.getBoolean("Cache.Activated")) {
 				cache = new HashMap<>();
-				ProxyServer.getInstance().getScheduler().schedule(this, () -> {
-					cache = new HashMap<>();
-				}, config.getLong("Cache.TimeInSeconds"), config.getLong("Cache.TimeInSeconds"), TimeUnit.SECONDS);
+				ProxyServer.getInstance().getScheduler().schedule(this, () -> cache = new HashMap<>(), config.getLong(
+						"Cache.TimeInSeconds"), config.getLong("Cache.TimeInSeconds"), TimeUnit.SECONDS);
 			}
 			registerAsExtension();
 		} catch (IOException e) {
@@ -54,9 +58,11 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 		String suffix = luckpermsUser.getCachedData().getMetaData().getSuffix();
 		if (suffix == null)
 			suffix = "";
-		String displayName = ChatColor.translateAlternateColorCodes('&',
-				displayNameTemplate.replaceAll("%LUCKPERMS_PREFIX%", prefix).
-						replaceAll("%LUCKPERMS_SUFFIX%", suffix).replaceAll("%PLAYER_NAME%", pPlayer.getName()));
+		String displayName = displayNameTemplate.replaceAll("%LUCKPERMS_PREFIX%", prefix).
+				replaceAll("%LUCKPERMS_SUFFIX%", suffix).replaceAll("%PLAYER_NAME%", pPlayer.getName());
+		if (reformatHexColor)
+			displayName = fixHexColors(displayName);
+		displayName = ChatColor.translateAlternateColorCodes('&', displayName);
 		if (cache != null)
 			cache.put(pPlayer.getUniqueId(), displayName);
 		return displayName;
@@ -86,5 +92,20 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 				return displayName;
 		}
 		return getDisplayName(pPlayer, userManager.getUser(pPlayer.getUniqueId()));
+	}
+
+	private String fixHexColors(String pMessage) {
+		Matcher matcher = HEX_PATTERN.matcher(pMessage);
+		StringBuffer buffer = new StringBuffer(pMessage.length() + 4 * 8);
+		while (matcher.find()) {
+			String group = matcher.group(1);
+			String COLOR_CHAR = "§";
+			matcher.appendReplacement(buffer, COLOR_CHAR + "x"
+					+ COLOR_CHAR + group.charAt(0) + COLOR_CHAR + group.charAt(1)
+					+ COLOR_CHAR + group.charAt(2) + COLOR_CHAR + group.charAt(3)
+					+ COLOR_CHAR + group.charAt(4) + COLOR_CHAR + group.charAt(5)
+			);
+		}
+		return matcher.appendTail(buffer).toString();
 	}
 }

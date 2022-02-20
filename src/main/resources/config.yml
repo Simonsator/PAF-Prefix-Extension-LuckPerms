@@ -1,0 +1,7 @@
+DisplayName: '&e<%LUCKPERMS_PREFIX%&e> %PLAYER_NAME% &e<%LUCKPERMS_SUFFIX%&e>'
+# Reformats hex colors from &#yyyyyy to the proper &x&y&y&y&y&y format. This will have a performance cost at runtime.
+# It is better to directly configure them in the luckperms database in a for minecraft readable name.
+ReformatHexColors: false
+Cache:
+  Activated: true
+  TimeInSeconds: 240

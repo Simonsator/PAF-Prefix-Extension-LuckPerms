@@ -6,7 +6,7 @@
 
 	<groupId>org.example</groupId>
 	<artifactId>LuckPerm-Display-Names-For-PAF</artifactId>
-	<version>1.0-RELEASE</version>
+	<version>1.0.1-RELEASE</version>
 
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
@@ -50,7 +50,7 @@
 		<dependency>
 			<groupId>de.simonsator</groupId>
 			<artifactId>BungeecordPartyAndFriends</artifactId>
-			<version>1.0.85</version>
+			<version>1.0.86</version>
 		</dependency>
 		<dependency>
 			<groupId>net.md-5</groupId>
