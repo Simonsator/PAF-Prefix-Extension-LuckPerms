@@ -8,7 +8,6 @@ import de.simonsator.partyandfriends.velocity.api.pafplayers.OnlinePAFPlayer;
 import de.simonsator.partyandfriends.velocity.api.pafplayers.PAFPlayer;
 import de.simonsator.partyandfriends.velocity.api.pafplayers.PAFPlayerClass;
 import de.simonsator.partyandfriends.velocity.utilities.ConfigurationCreator;
-import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
@@ -71,10 +70,23 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 				replaceAll("%LUCKPERMS_SUFFIX%", suffix).replaceAll("%PLAYER_NAME%", pPlayer.getName());
 		if (reformatHexColor)
 			displayName = fixHexColors(displayName);
-		displayName = LegacyComponentSerializer.legacy('&').deserialize(displayName).toString();
+		displayName = translateAlternateColorCodes('&', displayName);
 		if (cache != null)
 			cache.put(pPlayer.getUniqueId(), displayName);
 		return displayName;
+	}
+
+	public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
+		char[] b = textToTranslate.toCharArray();
+
+		for(int i = 0; i < b.length - 1; ++i) {
+			if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
+				b[i] = 167;
+				b[i + 1] = Character.toLowerCase(b[i + 1]);
+			}
+		}
+
+		return new String(b);
 	}
 
 	@Override
