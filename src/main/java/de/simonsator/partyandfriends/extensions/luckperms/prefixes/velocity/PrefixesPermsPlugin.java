@@ -1,20 +1,20 @@
-package de.simonsator.partyandfriends.extensions.luckperms.prefixes;
+package de.simonsator.partyandfriends.extensions.luckperms.prefixes.velocity;
 
-import de.simonsator.partyandfriends.api.PAFExtension;
-import de.simonsator.partyandfriends.api.pafplayers.DisplayNameProvider;
-import de.simonsator.partyandfriends.api.pafplayers.OnlinePAFPlayer;
-import de.simonsator.partyandfriends.api.pafplayers.PAFPlayer;
-import de.simonsator.partyandfriends.api.pafplayers.PAFPlayerClass;
-import de.simonsator.partyandfriends.extensions.luckperms.prefixes.configuration.PPLPConfiguration;
-import de.simonsator.partyandfriends.utilities.ConfigurationCreator;
+
+import de.simonsator.partyandfriends.extensions.luckperms.prefixes.velocity.configuration.PPLPConfiguration;
+import de.simonsator.partyandfriends.velocity.api.PAFExtension;
+import de.simonsator.partyandfriends.velocity.api.pafplayers.DisplayNameProvider;
+import de.simonsator.partyandfriends.velocity.api.pafplayers.OnlinePAFPlayer;
+import de.simonsator.partyandfriends.velocity.api.pafplayers.PAFPlayer;
+import de.simonsator.partyandfriends.velocity.api.pafplayers.PAFPlayerClass;
+import de.simonsator.partyandfriends.velocity.utilities.ConfigurationCreator;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
-import net.md_5.bungee.api.ChatColor;
-import net.md_5.bungee.api.ProxyServer;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
@@ -23,11 +23,28 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProvider {
+	private final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
 	private UserManager userManager;
 	private String displayNameTemplate;
 	private HashMap<UUID, String> cache;
 	private boolean reformatHexColor;
-	private final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
+
+	public PrefixesPermsPlugin(Path folder) {
+		super(folder);
+	}
+
+	public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
+		char[] b = textToTranslate.toCharArray();
+
+		for (int i = 0; i < b.length - 1; ++i) {
+			if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
+				b[i] = 167;
+				b[i + 1] = Character.toLowerCase(b[i + 1]);
+			}
+		}
+
+		return new String(b);
+	}
 
 	@Override
 	public void onEnable() {
@@ -40,13 +57,17 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 			PAFPlayerClass.setDisplayNameProvider(this);
 			if (config.getBoolean("Cache.Activated")) {
 				cache = new HashMap<>();
-				ProxyServer.getInstance().getScheduler().schedule(this, () -> cache = new HashMap<>(), config.getLong(
-						"Cache.TimeInSeconds"), config.getLong("Cache.TimeInSeconds"), TimeUnit.SECONDS);
+				PrefixesPermsPluginLoader.server.getScheduler().buildTask(this, () -> cache = new HashMap<>()).delay(config.getLong("Cache.TimeInSeconds"), TimeUnit.SECONDS).schedule();
 			}
 			registerAsExtension();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public String getName() {
+		return "LuckPerm-Display-Names-For-PAF";
 	}
 
 	private String getDisplayName(PAFPlayer pPlayer, User luckpermsUser) {
@@ -62,7 +83,7 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 				replaceAll("%LUCKPERMS_SUFFIX%", suffix).replaceAll("%PLAYER_NAME%", pPlayer.getName());
 		if (reformatHexColor)
 			displayName = fixHexColors(displayName);
-		displayName = ChatColor.translateAlternateColorCodes('&', displayName);
+		displayName = translateAlternateColorCodes('&', displayName);
 		if (cache != null)
 			cache.put(pPlayer.getUniqueId(), displayName);
 		return displayName;
@@ -76,8 +97,7 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 				return displayName;
 		}
 		try {
-			User luckpermsUser = userManager.loadUser(pPlayer.getUniqueId()).get();
-			return getDisplayName(pPlayer, luckpermsUser);
+			return getDisplayName(pPlayer, userManager.loadUser(pPlayer.getUniqueId()).get());
 		} catch (InterruptedException | ExecutionException e) {
 			e.printStackTrace();
 		}

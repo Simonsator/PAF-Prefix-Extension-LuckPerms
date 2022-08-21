@@ -1,4 +1,4 @@
-package de.simonsator.partyandfriends.extensions.luckperms.prefixes.configuration;
+package de.simonsator.partyandfriends.extensions.luckperms.prefixes.bungee.configuration;
 
 import de.simonsator.partyandfriends.api.PAFPluginBase;
 import de.simonsator.partyandfriends.utilities.ConfigurationCreator;
