@@ -1,7 +1,9 @@
-package de.simonsator.partyandfriends.extensions.luckperms.prefixes.configuration;
+package de.simonsator.partyandfriends.extensions.luckperms.prefixes.velocity.configuration;
 
-import de.simonsator.partyandfriends.api.PAFPluginBase;
-import de.simonsator.partyandfriends.utilities.ConfigurationCreator;
+
+
+import de.simonsator.partyandfriends.velocity.api.PAFPluginBase;
+import de.simonsator.partyandfriends.velocity.utilities.ConfigurationCreator;
 
 import java.io.File;
 import java.io.IOException;
