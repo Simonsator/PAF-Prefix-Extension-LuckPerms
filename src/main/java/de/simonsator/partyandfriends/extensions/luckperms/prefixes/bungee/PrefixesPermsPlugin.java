@@ -23,11 +23,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProvider {
+	private final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
 	private UserManager userManager;
 	private String displayNameTemplate;
 	private HashMap<UUID, String> cache;
 	private boolean reformatHexColor;
-	private final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
 
 	@Override
 	public void onEnable() {

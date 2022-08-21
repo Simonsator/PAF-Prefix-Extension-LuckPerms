@@ -13,23 +13,24 @@ import de.simonsator.partyandfriends.velocity.main.PAFPlugin;
 import java.nio.file.Path;
 
 @Plugin(id = "luckperm-display-names-for-paf", name = "LuckPerm-Display-Names-For-PAF", version = "1.0.3-RELEASE",
-        url = "https://www.spigotmc.org/resources/luckperms-display-names-for-party-and-friends-for-bungeecord.99298/", description = "An add-on for party and friends to add display names from luckperm to the names", authors = {"JT122406", "Simonsator"}, dependencies = {@Dependency(id = "partyandfriends"),@Dependency(id = "luckperms")})
+		url = "https://www.spigotmc.org/resources/luckperms-display-names-for-party-and-friends-for-bungeecord.99298/",
+		description = "An add-on for party and friends to add display names from luckperm to the names",
+		authors = {"JT122406", "Simonsator"}, dependencies = {@Dependency(id = "partyandfriends"), @Dependency(id = "luckperms")})
 public class PrefixesPermsPluginLoader {
+	public static ProxyServer server = null;
+	private final Path folder;
 
-    public static ProxyServer server = null;
-    private final Path folder;
+	@Inject
+	public PrefixesPermsPluginLoader(@DataDirectory final Path folder, ProxyServer server) {
+		PrefixesPermsPluginLoader.server = server;
+		this.folder = folder;
+	}
 
-    @Inject
-    public PrefixesPermsPluginLoader(@DataDirectory final Path folder, ProxyServer server) {
-        PrefixesPermsPluginLoader.server = server;
-        this.folder = folder;
-    }
-
-    @Subscribe
-    public void onProxyInitialization(ProxyInitializeEvent event) {
-        PAFPlugin.loadExtension(new VelocityExtensionLoadingInfo(new PrefixesPermsPlugin(folder),
-                "luckperm-display-names-for-paf",
-                "LuckPerm-Display-Names-For-PAF",
-                "1.0.3-RELEASE", "JT122406"));
-    }
+	@Subscribe
+	public void onProxyInitialization(ProxyInitializeEvent event) {
+		PAFPlugin.loadExtension(new VelocityExtensionLoadingInfo(new PrefixesPermsPlugin(folder),
+				"luckperm-display-names-for-paf",
+				"LuckPerm-Display-Names-For-PAF",
+				"1.0.3-RELEASE", "JT122406"));
+	}
 }

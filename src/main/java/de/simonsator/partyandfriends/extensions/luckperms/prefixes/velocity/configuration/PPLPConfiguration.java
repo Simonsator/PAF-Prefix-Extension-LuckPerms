@@ -1,7 +1,6 @@
 package de.simonsator.partyandfriends.extensions.luckperms.prefixes.velocity.configuration;
 
 
-
 import de.simonsator.partyandfriends.velocity.api.PAFPluginBase;
 import de.simonsator.partyandfriends.velocity.utilities.ConfigurationCreator;
 

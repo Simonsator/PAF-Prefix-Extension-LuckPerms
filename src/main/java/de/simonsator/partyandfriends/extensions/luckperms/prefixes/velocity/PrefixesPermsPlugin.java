@@ -22,15 +22,28 @@ import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProvider{
+public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProvider {
+	private final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
 	private UserManager userManager;
 	private String displayNameTemplate;
 	private HashMap<UUID, String> cache;
 	private boolean reformatHexColor;
-	private final Pattern HEX_PATTERN = Pattern.compile("&#" + "([A-Fa-f0-9]{6})");
 
 	public PrefixesPermsPlugin(Path folder) {
 		super(folder);
+	}
+
+	public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
+		char[] b = textToTranslate.toCharArray();
+
+		for (int i = 0; i < b.length - 1; ++i) {
+			if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
+				b[i] = 167;
+				b[i + 1] = Character.toLowerCase(b[i + 1]);
+			}
+		}
+
+		return new String(b);
 	}
 
 	@Override
@@ -74,19 +87,6 @@ public class PrefixesPermsPlugin extends PAFExtension implements DisplayNameProv
 		if (cache != null)
 			cache.put(pPlayer.getUniqueId(), displayName);
 		return displayName;
-	}
-
-	public static String translateAlternateColorCodes(char altColorChar, String textToTranslate) {
-		char[] b = textToTranslate.toCharArray();
-
-		for(int i = 0; i < b.length - 1; ++i) {
-			if (b[i] == altColorChar && "0123456789AaBbCcDdEeFfKkLlMmNnOoRrXx".indexOf(b[i + 1]) > -1) {
-				b[i] = 167;
-				b[i + 1] = Character.toLowerCase(b[i + 1]);
-			}
-		}
-
-		return new String(b);
 	}
 
 	@Override
