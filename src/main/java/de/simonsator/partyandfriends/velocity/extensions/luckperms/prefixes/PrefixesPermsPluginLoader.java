@@ -1,4 +1,4 @@
-package de.simonsator.partyandfriends.extensions.luckperms.prefixes.velocity;
+package de.simonsator.partyandfriends.velocity.extensions.luckperms.prefixes;
 
 import com.google.inject.Inject;
 import com.velocitypowered.api.event.Subscribe;

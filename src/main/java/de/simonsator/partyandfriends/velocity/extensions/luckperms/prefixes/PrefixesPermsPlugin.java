@@ -1,8 +1,8 @@
-package de.simonsator.partyandfriends.extensions.luckperms.prefixes.velocity;
+package de.simonsator.partyandfriends.velocity.extensions.luckperms.prefixes;
 
 
 import de.simonsator.partyandfriends.extensions.luckperms.prefixes.common.LuckpermsPrefixManager;
-import de.simonsator.partyandfriends.extensions.luckperms.prefixes.velocity.configuration.PPLPConfiguration;
+import de.simonsator.partyandfriends.velocity.extensions.luckperms.prefixes.configuration.PPLPConfiguration;
 import de.simonsator.partyandfriends.velocity.api.PAFExtension;
 import de.simonsator.partyandfriends.velocity.api.pafplayers.DisplayNameProvider;
 import de.simonsator.partyandfriends.velocity.api.pafplayers.OnlinePAFPlayer;
