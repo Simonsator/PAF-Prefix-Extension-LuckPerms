@@ -6,7 +6,7 @@
 
 	<groupId>org.example</groupId>
 	<artifactId>LuckPerm-Display-Names-For-PAF</artifactId>
-	<version>1.0.3-RELEASE</version>
+	<version>1.0.4-RELEASE</version>
 
 	<properties>
 		<maven.compiler.source>8</maven.compiler.source>
